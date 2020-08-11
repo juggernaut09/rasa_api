@@ -6,6 +6,12 @@ from flask import jsonify
 
 def register_attendance(payload):
     try:
+        if (datetime.utcnow() > datetime.now().replace(hour=11, minute=0, second=0, microsecond=0)):
+            return False, {
+                'message': 'You can mark attendance before 11 AM',
+                'status_code': 400,
+                'internal_data': None
+            }
         status, employee_details = db_get_employee({
             'emp_id': payload['emp_id'],
             'role': payload['role'],
