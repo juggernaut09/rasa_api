@@ -34,7 +34,7 @@ def db_employee_register(payload):
             'role': payload['role'],
             # 'password': encrypted_pwd,
             'status': 'active',
-            'created_at': datetime.datetime.utcnow(),
+            'created_at': datetime.datetime.now(),
             'deleted_at': None,
             'updated_at': None
         })

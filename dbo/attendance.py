@@ -9,10 +9,12 @@ def db_register_attendance(employee_details):
             'emp_id': employee_details['emp_id'],
             'role': employee_details['role'],
             'name': employee_details['name'],
-            'month': datetime.utcnow().month,
-            'day': datetime.utcnow().day,
-            'year': datetime.utcnow().year,
-            'created_at': datetime.utcnow(),
+            'month': datetime.now().month,
+            'day': datetime.now().day,
+            'year': datetime.now().year,
+            'time': "{}:{}:{}".format(datetime.now().hour, datetime.now().minute, datetime.now().second),
+            'created_at': datetime.now(),
+            'attendance': 'present',
             'status': 'active',
             'deleted_at': None,
             'updated_at': None
@@ -51,6 +53,30 @@ def db_check_today_attendance(query):
             'message': 'You have not marked the attendance today',
             'internal_data': None,
             'status_code': 400
+        }
+    except Exception as e:
+        return False, {
+            'message': 'Something went wrong, Please try again later',
+            'internal_data': str(e),
+            'status_code': 500
+        }
+
+def db_get_attendance_analysis(query):
+    try:
+        response = list(db.attendance.find(query))
+        if len(response):
+            for resp in response:
+                resp.pop('_id')
+                if 'created_at' in resp:
+                    resp.pop('created_at')
+                resp.pop('deleted_at')
+                resp.pop('updated_at')
+                resp.pop('status')
+            return True, response
+        return False, {
+        'message': 'There is no details to show.',
+        'status_code': 400,
+        'internal_data': None
         }
     except Exception as e:
         return False, {

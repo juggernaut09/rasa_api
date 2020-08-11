@@ -4,3 +4,7 @@ MONGODB={
     'port':27017,
     'database':'rasa_api'
 }
+
+HOST={
+    'url': 'http://localhost/5000'
+}
