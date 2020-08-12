@@ -47,7 +47,7 @@ def register_attendance(payload):
             'status_code': 500
         }), 500
 
-def get_present_month_analysis(payload):
+def get_year_analysis(payload):
     try:
         if payload["role"] != "admin":
             return False, {
@@ -63,9 +63,81 @@ def get_present_month_analysis(payload):
         if not status:
             return status, employee_details
         status, response = db_get_attendance_analysis(query= {
-                                                        'month': datetime.now().month,
+                                                        'year': int(payload['year']),
                                                         'status': 'active',
-                                                        'year': datetime.now().year
+                                                        })
+        if status:
+            xlsx_path = os.path.join('static', 'xlsx', 'data.xlsx')
+            conv = Converter()
+            conv.convert(response, Writer(file=xlsx_path))
+            return True, {
+                "url": '{}/{}'.format(app.config['HOST']['url'], xlsx_path)
+                }
+        return False, response
+    except Exception as e:
+        return False, jsonify({
+            'message': 'something went wrong, please try again later',
+            'internal_data': str(e),
+            'status_code': 500
+        }), 500
+
+def get_month_analysis(payload):
+    try:
+        if payload["role"] != "admin":
+            return False, {
+            'message': 'You are not authorized to do this action',
+            'status_code': 401,
+            'internal_data': None
+            }
+        status, employee_details = db_get_employee({
+            'emp_id': payload['emp_id'],
+            'role': payload['role'],
+            'status': 'active'
+        })
+        if not status:
+            return status, employee_details
+        print('month : '.format(payload['month']))
+        status, response = db_get_attendance_analysis(query= {
+                                                        'month': int(payload["month"]),
+                                                        'year': int(payload['year']),
+                                                        'status': 'active',
+                                                        })
+        if status:
+            xlsx_path = os.path.join('static', 'xlsx', 'data.xlsx')
+            conv = Converter()
+            conv.convert(response, Writer(file=xlsx_path))
+            return True, {
+                "url": '{}/{}'.format(app.config['HOST']['url'], xlsx_path)
+                }
+        return False, response
+    except Exception as e:
+        return False, jsonify({
+            'message': 'something went wrong, please try again later',
+            'internal_data': str(e),
+            'status_code': 500
+        }), 500
+
+
+def get_day_analysis(payload):
+    try:
+        if payload["role"] != "admin":
+            return False, {
+            'message': 'You are not authorized to do this action',
+            'status_code': 401,
+            'internal_data': None
+            }
+        status, employee_details = db_get_employee({
+            'emp_id': payload['emp_id'],
+            'role': payload['role'],
+            'status': 'active'
+        })
+        if not status:
+            return status, employee_details
+        status, response = db_get_attendance_analysis(query= {
+                                                        'month': int(payload["month"]),
+                                                        'day': int(payload['day']),
+                                                        'status': 'active',
+                                                        'year': int(payload['year'])
                                                         })
         # print('response : {}'.format(response))
         if status:

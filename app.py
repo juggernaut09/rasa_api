@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask import request as req
 from flask import json
 from flask import jsonify
@@ -29,8 +29,7 @@ def not_found_route(error=None):
     resp = jsonify(message)
     resp.status_code = 404
     return resp
-
-
+    
 from dbo.client import client
 from router.user import bp as user_routes
 from router.employee import blueprint as employee_routes
